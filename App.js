@@ -8,11 +8,29 @@ export default function App() {
   const [bananaCurrency, setBananaCurrency] = useState("USD");
   const [valueInput, setValueInput] = useState("33.33");
   const [result, setResult] = useState("");
+  const handleConvert = async () => {
+    let URL = `https://economia.awesomeapi.com.br/last/${originCurrency}-${bananaCurrency}`;
+    try {
+      let page = await fetch(URL);
+      let json = await page.json();
+      let indice = parseFloat(json[`${originCurrency}${bananaCurrency}`].high);
+      let value = parseFloat(valueInput);
+      setResult((value * indice).toFixed(2));
+    } catch (error) {
+      setResult(`Erro: ${error.message}`);
+    }
+  };
+  const handleClear = () => {
+    setResult("");
+    setValueInput("33.333333");
+    setOriginCurrency("BRL");
+    setBananaCurrency("USD");
+  };
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Conversor de Moedas</Text>
       <View>
-        <Text style={styles.label}>Moeda 1</Text>
+        <Text style={styles.label}>Moeda de origen:</Text>
         <Picker
           itemStyle={styles.picker}
           style={styles.picker}
@@ -27,7 +45,7 @@ export default function App() {
         </Picker>
       </View>
       <View>
-        <Text style={styles.label}>Moeda 2</Text>
+        <Text style={styles.label}>Moeda de destino:</Text>
         <Picker
           itemStyle={styles.picker}
           style={styles.picker}
@@ -51,12 +69,15 @@ export default function App() {
         ></TextInput>
       </View>
       <View>
-        <Pressable style={styles.button}>
-          <Text style={styles.title}>Conveter</Text>
+        <Pressable style={styles.button} onPress={handleConvert}>
+          <Text style={styles.buttonLabel}>Conveter</Text>
         </Pressable>
-        <Pressable style={styles.button}>
-          <Text style={styles.title}>Limpar</Text>
+        <Pressable style={styles.button} onPress={handleClear}>
+          <Text style={styles.buttonLabel}>Limpar</Text>
         </Pressable>
+      </View>
+      <View>
+        <Text style={styles.input}>{result}</Text>
       </View>
       <StatusBar style="auto" />
     </View>
@@ -71,14 +92,24 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   title: {
+    fontSize: 20,
     color: "#fff",
   },
+
   picker: {
     color: "#fff",
     dropdownIconColor: "#fff",
     selectionColor: "#fff",
     width: 200,
     height: 40,
+  },
+  pickerLabel: {
+    fontSize: 18,
+    color: "#fff",
+  },
+  pickerText: {
+    fontSize: 18,
+    color: "#fff",
   },
   label: {
     color: "#fff",
@@ -91,6 +122,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
     justifyContent: "center",
     height: 40,
+  },
+  buttonLabel: {
+    fontSize: 18,
+    color: "#fff",
   },
   input: {
     textAlign: "right",
